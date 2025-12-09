@@ -9,6 +9,5 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Temporary files
-tmp/
-*.log
+# Local build scripts
+build_and_push.sh

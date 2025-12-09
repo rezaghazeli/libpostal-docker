@@ -68,7 +68,10 @@ WORKDIR /data
 
 # Copy libpostal libraries and headers
 COPY --from=builder /usr/lib/libpostal.so* /usr/lib/
+COPY --from=builder /usr/lib/libpostal.a /usr/lib/
+COPY --from=builder /usr/lib/libpostal.la /usr/lib/
 COPY --from=builder /usr/include/libpostal /usr/include/libpostal
+COPY --from=builder /usr/lib/pkgconfig/libpostal.pc /usr/lib/pkgconfig/libpostal.pc
 
 # Copy BOTH data downloader scripts
 COPY --from=builder /tmp/libpostal_data_default /usr/local/bin/libpostal_data_default
