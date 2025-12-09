@@ -1,0 +1,14 @@
+# Data directory (contains large model files)
+data/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Temporary files
+tmp/
+*.log

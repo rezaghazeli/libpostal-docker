@@ -1,0 +1,93 @@
+name: Docker Publish
+
+on:
+  push:
+    branches: [ "master" ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  DOCKERHUB_USERNAME: rezaq
+  BASE_IMAGE_NAME: libpostal
+  REST_IMAGE_NAME: libpostal-rest
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [alpine, debian]
+        target: [base, rest]
+        include:
+          # Alpine Base
+          - distro: alpine
+            target: base
+            dockerfile: Dockerfile.alpine
+            image_name: libpostal
+            tag_suffix: -alpine
+          # Alpine REST
+          - distro: alpine
+            target: rest
+            dockerfile: Dockerfile.alpine
+            image_name: libpostal-rest
+            tag_suffix: -alpine
+          # Debian Base
+          - distro: debian
+            target: base
+            dockerfile: Dockerfile.debian
+            image_name: libpostal
+            tag_suffix: ""
+          # Debian REST
+          - distro: debian
+            target: rest
+            dockerfile: Dockerfile.debian
+            image_name: libpostal-rest
+            tag_suffix: ""
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}
+          tags: |
+            type=ref,event=branch,suffix=${{ matrix.tag_suffix }}
+            type=semver,pattern={{version}},suffix=${{ matrix.tag_suffix }}
+            type=semver,pattern={{major}}.{{minor}},suffix=${{ matrix.tag_suffix }}
+            type=raw,value=latest,enable=${{ matrix.distro == 'debian' }}
+            type=raw,value=alpine,enable=${{ matrix.distro == 'alpine' }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
