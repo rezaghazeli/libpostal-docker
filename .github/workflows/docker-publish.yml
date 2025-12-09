@@ -73,7 +73,6 @@ jobs:
         with:
           images: ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}
           tags: |
-            type=ref,event=branch,suffix=${{ matrix.tag_suffix }}
             type=semver,pattern={{version}},suffix=${{ matrix.tag_suffix }}
             type=semver,pattern={{major}}.{{minor}},suffix=${{ matrix.tag_suffix }}
             type=raw,value=latest,enable=${{ matrix.distro == 'debian' }}
