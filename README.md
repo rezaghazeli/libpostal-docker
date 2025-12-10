@@ -92,13 +92,13 @@ services:
 **Parse Address:**
 
 ```bash
-curl -X POST -d '{"address": "781 Franklin Ave Crown Heights Brooklyn NYC NY 11216 USA"}' http://localhost:8080/parser
+curl -X POST -d '{"query": "781 Franklin Ave Crown Heights Brooklyn NYC NY 11216 USA"}' http://localhost:8080/parser
 ```
 
 **Expand Address:**
 
 ```bash
-curl -X POST -d '{"address": "781 Franklin Ave Crown Heights Brooklyn NYC NY 11216 USA"}' http://localhost:8080/expand
+curl -X POST -d '{"query": "781 Franklin Ave Crown Heights Brooklyn NYC NY 11216 USA"}' http://localhost:8080/expand
 ```
 
 ## Build Locally
